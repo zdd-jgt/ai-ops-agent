@@ -58,6 +58,16 @@
 - 自动生成处理建议。
 - 记录人工采纳、拒绝和修正结果。
 
+### Agent Runtime 与 MCP
+
+- 实现一个模块化本地 MCP Server。
+- 本地开发支持 `stdio`，Kubernetes 部署支持内部 Streamable HTTP。
+- 第一批适配器覆盖事件中心、Prometheus 和 Kubernetes。
+- 第一阶段使用一个诊断 Agent 和可恢复的确定性 Workflow，不直接建设复杂 Agent 网络。
+- 限制单次诊断的工具数量、循环次数、运行时间和结果大小。
+- 对每次工具调用记录 Agent、Scope、参数摘要、数据范围、耗时和状态。
+- 使用 Mastra 验证 Workflow、MCP、暂停/恢复、PostgreSQL 存储、OpenTelemetry 和 Scorers。
+
 ## P1：第一期有限覆盖
 
 - 慢接口与调用链热点。
@@ -91,4 +101,6 @@
 - 飞书/企微不可用时不影响事件中心工作。
 - 关闭公网后，本地版核心功能仍能运行。
 - 人工可以对根因和建议进行采纳、拒绝和修正。
-
+- 诊断 Workflow 可以在中断后恢复，不重复创建事件或重复执行已完成步骤。
+- 所有 MCP 工具调用都可审计，越权、超范围和任意命令请求被拒绝。
+- 完全断网验证中不产生公网 DNS、HTTP、模型或遥测请求。

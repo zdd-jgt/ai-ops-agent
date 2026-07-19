@@ -81,10 +81,19 @@
 
 任何执行都必须经过工具白名单、参数校验、最小权限、幂等检查、超时控制、执行前快照、结果验证和审计。
 
+## 不可信 AI 输入原则
+
+- 日志、Trace、告警描述、工单、Runbook、代码注释和 MCP 返回内容全部视为不可信输入。
+- 从数据中读取到的“忽略规则”“执行命令”“泄露提示词”等文本不得改变系统指令或权限策略。
+- 检索结果必须保留来源、版本和访问控制，不允许跨租户拼接上下文。
+- 模型生成的查询和动作必须转换为结构化 Schema，并由服务端重新校验。
+- 提示词、工具输入输出和 Agent Trace 在写入可观测系统前必须再次执行敏感信息过滤。
+
+完整威胁与控制见 [安全威胁模型](10-security-threat-model.md)。
+
 ## 参考资料
 
 - [OpenTelemetry 敏感数据处理](https://opentelemetry.io/docs/security/handling-sensitive-data/)
 - [Amazon Bedrock 数据保护](https://docs.aws.amazon.com/bedrock/latest/userguide/data-protection.html)
 - [Amazon Bedrock Guardrails 敏感信息过滤](https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails-sensitive-filters.html)
 - [Amazon Bedrock 与 SageMaker 选择指南](https://docs.aws.amazon.com/decision-guides/latest/bedrock-or-sagemaker/bedrock-or-sagemaker.html)
-

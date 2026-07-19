@@ -57,6 +57,9 @@
 ```text
 tenant_id
 deployment_id
+schema_version
+source_system
+source_event_id
 service.namespace
 service.name
 service.instance.id
@@ -103,6 +106,8 @@ OPEN
 
 同时支持误报、重复事件、合并、重新打开和升级等状态操作。
 
+事件、告警、异常、工单和证据的统一定义、幂等与关联规则见 [领域模型与术语](09-domain-model-and-glossary.md)。
+
 ## 参考资料
 
 - [OpenTelemetry Kubernetes Collector](https://opentelemetry.io/docs/collector/install/kubernetes/)
@@ -111,4 +116,3 @@ OPEN
 - [Backstage 软件目录](https://backstage.io/docs/features/software-catalog/)
 - [Grafana Tempo 架构](https://grafana.com/docs/tempo/latest/introduction/architecture/)
 - [Grafana Loki](https://grafana.com/docs/loki/latest/)
-
