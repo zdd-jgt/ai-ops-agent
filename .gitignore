@@ -1,0 +1,114 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editors and IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.key
+*.p12
+*.pfx
+secrets.local.yaml
+secrets.local.yml
+*.secret.yaml
+*.secret.yml
+certs/local/
+
+# Logs, runtime files and temporary files
+*.log
+logs/
+*.pid
+*.pid.lock
+tmp/
+temp/
+.tmp/
+.cache/
+.local/
+runtime-data/
+
+# Node.js
+node_modules/
+.npm/
+.pnpm-store/
+.yarn/cache/
+.yarn/unplugged/
+.next/
+.nuxt/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+
+# Go
+/bin/
+*.test
+*.out
+vendor/
+
+# Test and browser artifacts
+test-results/
+playwright-report/
+blob-report/
+screenshots/
+
+# Local databases and observability storage
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+prometheus-data/
+loki-data/
+tempo-data/
+grafana-data/
+postgres-data/
+minio-data/
+
+# Local model weights and model caches
+models/
+model-cache/
+*.gguf
+*.safetensors
+*.onnx
+*.pt
+*.pth
+
+# Terraform local state
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+*.tfvars
+!*.tfvars.example
+
+# Local Kubernetes and Helm output
+kubeconfig
+kubeconfig.*
+*.kubeconfig
+rendered-manifests/
+charts/*.tgz
+
