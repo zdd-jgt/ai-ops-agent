@@ -33,8 +33,31 @@
 - OpenTelemetry、Prometheus、Loki、Tempo、Grafana、Alertmanager。
 - PostgreSQL 作为事件中心和结构化状态存储。
 - Mastra 作为第一期 Agent Runtime 候选，需通过本地与完全断网技术验证。
-- AWS 版优先适配 Amazon Bedrock；私有化版连接本地模型服务。
+- 云上版本通过可插拔模型网关支持客户选择模型 Provider；DeepSeek API 和 Qwen API 只是开发阶段的首批验证适配器，正式 AWS 交付继续保留 Amazon Bedrock 等原生适配能力。
+- 完全断网版只连接本地模型服务，启动前执行主机硬件与运行环境预检，低于所选模型最低要求时阻止启动。
 - 本地开发使用 MCP `stdio`，Kubernetes 内部使用 Streamable HTTP。
+
+## 模型接入（规划）
+
+当前项目尚处于设计阶段，以下能力尚未实现，但已经纳入第一阶段范围。
+
+### 云端模型
+
+- 模型网关采用 Provider 插件机制，不把产品绑定到 DeepSeek、Qwen 或单一云厂商。
+- DeepSeek 和 Qwen 使用项目开发者自己的 API Key，作为首批适配和回归测试模型。
+- 客户可以配置自己的 OpenAI-compatible 服务，包括 Base URL、模型名称和服务端 API Key 引用。
+- 不兼容 OpenAI 协议的服务通过独立原生 Provider Adapter 接入，例如后续的 Amazon Bedrock。
+- 新 Provider 必须先通过连通性、结构化输出、Tool Calling、超时和 Golden Incidents 测试，才能启用。
+- API Key 只能保存在服务端环境变量或密钥系统中，不得进入浏览器、日志、Prompt、Trace 或 Git。
+
+### 本地离线模型
+
+本地模型权重不进入代码仓库和应用镜像，支持两种使用方式：
+
+1. 使用规划中的 `aiops model import <离线模型包>` 导入默认目录 `/opt/aiops/models/`。
+2. 在部署配置中指定客户已有的模型绝对路径，并以只读方式挂载给推理服务。
+
+Air-Gapped 模式不会自动联网下载模型。启动前必须验证模型清单、权重哈希、CPU、内存、GPU、显存、磁盘和运行时兼容性；任一必需项不满足时，本地模型和 Agent Runtime 都不会启动，也不会回退到云端模型。
 
 ## 文档
 

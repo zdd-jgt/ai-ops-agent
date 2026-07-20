@@ -218,7 +218,7 @@ Mastra 同时提供 Agent、Workflow、类型化 Tools、MCP Client 和 MCP Serv
 - Mastra 的工具审批不能替代项目自己的审批记录和执行网关。
 - Air-Gapped Profile 禁止动态发现公网 MCP Server。
 
-Mastra 采用与限制详见 [Agent Runtime 与 Mastra](13-agent-runtime-design.md)。
+Mastra 采用与限制详见 [阶段 0 Agent Runtime 与 Mastra](../phase-0/agent-runtime-design.md)。
 
 ## 完全断网要求
 

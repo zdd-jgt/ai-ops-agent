@@ -93,11 +93,15 @@ Mastra Memory 不等于运维知识库或项目长期事实：
 ## 模型接入
 
 - Agent Runtime 只调用项目模型网关。
-- AWS Profile 由模型网关路由 Bedrock 或批准的 AWS 推理服务。
+- 云上模型网关支持注册客户批准的 Provider；开发阶段首批实现 DeepSeek API 和 Qwen API，统一使用服务端 API Key 引用。
+- 第一阶段提供 Custom OpenAI-compatible Provider；不兼容该协议的模型通过独立原生 Adapter 扩展。
+- 正式 AWS Profile 保留 Bedrock 或批准的 AWS 推理服务 Provider，不要求与开发阶段使用同一个模型。
 - Private Connected 可以按数据策略选择本地或云端模型。
 - Air-Gapped 只允许显式配置的本地模型端点。
 - 禁止运行时从公网动态获取模型目录或自动切换未知提供商。
 - 本地模型兼容性、结构化输出和 Tool Calling 必须通过 Golden Incidents 验证。
+- Provider 的 Chat、Tool Calling、结构化输出和推理参数差异由模型网关适配，Mastra Workflow 不直接依赖厂商 SDK。
+- Air-Gapped 必须先通过硬件与离线模型预检，再启动本地推理和 Mastra；预检失败时整个离线运行链路停止。
 
 ## MCP 集成
 
@@ -140,13 +144,15 @@ Mastra Workflow 的 `suspend/resume` 适合暂停等待人工决定，但：
 1. 使用 TypeScript 创建最小 Mastra 项目。
 2. 创建包含固定步骤和一个诊断 Agent 的 Workflow。
 3. 通过 `MCPClient` 调用模拟事件、Prometheus 和 Kubernetes 工具。
-4. 连接本地 OpenAI-compatible 模型端点。
-5. 验证结构化输出、工具调用和超时。
-6. 使用 PostgreSQL 保存 Workflow Snapshot。
-7. 在人工步骤 `suspend`，重启 Runtime 后 `resume`。
-8. 将 Trace 输出到本地 OTel Collector。
-9. 添加确定性测试和自定义 Scorer。
-10. 阻断公网，验证整个流程没有外发请求。
+4. 在云上开发 Profile 分别连接 DeepSeek API、Qwen API 和一个模拟 Custom OpenAI-compatible Provider。
+5. 在 Air-Gapped Profile 连接本地 OpenAI-compatible 模型端点。
+6. 验证两类云端 Provider 与本地 Provider 的结构化输出、工具调用、超时和能力差异。
+7. 实现离线主机预检，并验证资源不足时模型与 Runtime 均不会启动。
+8. 使用 PostgreSQL 保存 Workflow Snapshot。
+9. 在人工步骤 `suspend`，重启 Runtime 后 `resume`。
+10. 将 Trace 输出到本地 OTel Collector。
+11. 添加确定性测试和自定义 Scorer。
+12. 阻断公网，验证整个流程没有外发请求和云模型回退。
 
 ## 采用门槛
 
@@ -174,4 +180,3 @@ Mastra Workflow 的 `suspend/resume` 适合暂停等待人工决定，但：
 - [Mastra Observability](https://mastra.ai/ai-agent-observability)
 - [Mastra Storage](https://mastra.ai/blog/mastra-storage)
 - [Mastra Self-hosted Deployment Models](https://mastra.ai/blog/deployment-models)
-

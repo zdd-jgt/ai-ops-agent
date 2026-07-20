@@ -20,15 +20,18 @@
 
 ## 模型
 
+- 已确认：云上模型网关允许客户接入经过批准的 Provider；DeepSeek API 和 Qwen API 仅作为开发者首批验证适配器；Air-Gapped 只使用通过启动预检的本地模型，不允许云端回退。
 - 本地模型候选及其企业许可证。
-- 第一版目标是 7B、14B 还是更大的量化模型。
+- 默认按 14B 4bit、24GB 显存级 POC 基线验证；最终模型及并发仍待 Golden Incidents 和容量压测确认。
 - Embedding 和 Reranker 模型候选。
+- DeepSeek 和 Qwen 各自的默认/深度推理模型、区域、配额与成本上限。
+- 第一批面向客户交付的原生 Provider 清单，以及 Custom OpenAI-compatible Provider 支持的协议子集。
 - 中文运维评测集、工具调用评测和根因候选命中率标准。
 - Private Connected 是否允许把 S2 脱敏证据发送到云端模型。
 
 ## Agent 与执行
 
-- `08-local-mcp-server.md` 中的第一期 MCP 工具清单和 Schema 最终确认。
+- `phases/phase-1/local-mcp-server.md` 中的第一期 MCP 工具清单和 Schema 最终确认。
 - Agent Runtime 是否在 Mastra 技术验证通过后正式采用 Mastra。
 - 第一期 TypeScript/Node.js 版本、包管理器和 Monorepo 工具。
 - 单 Agent Workflow 何时升级为 Supervisor/多 Agent 架构。

@@ -36,6 +36,8 @@
 
 当前 Intel Mac 可以作为 Lite 开发环境继续使用，但开发时应支持关闭本地大模型、缩短数据保留周期和使用模拟遥测数据。
 
+在云上开发 Profile 中，该电脑可以通过模型网关调用 DeepSeek API、Qwen API 或其他已注册 Provider，因此不需要在本机启动主推理模型。API 不可用时应明确报错或使用显式启用的 Mock Provider，不能静默切换到未知模型。
+
 ## 私有化离线 POC 最低建议
 
 | 资源 | 建议基线 |
@@ -49,6 +51,36 @@
 | 模型目标 | 7B～14B 量化模型、低并发 |
 
 该配置用于 POC 和小规模非高可用环境，不等于生产 SLA。
+
+## Air-Gapped 启动预检
+
+离线模式在启动任何本地模型服务和 Agent Runtime 前必须执行主机预检。默认 `14b-q4` 级别 POC 基线为：
+
+| 检查项 | 最低值 | 不满足时行为 |
+|---|---|---|
+| 操作系统 | 支持清单内的 x86_64 Linux | 阻止启动 |
+| CPU | 16 核 | 阻止启动 |
+| 内存 | 64GB | 阻止启动 |
+| GPU | 受支持的 NVIDIA GPU | 阻止启动 |
+| GPU 显存 | 24GB | 阻止启动 |
+| 安装盘 | 1TB NVMe SSD | 阻止启动 |
+| 可用空间 | 由离线包和模型清单计算，且保留运行安全余量 | 阻止启动 |
+| GPU 驱动/推理运行时 | 与离线兼容矩阵匹配 | 阻止启动 |
+| 模型权重 | 文件完整、哈希匹配且版本受支持 | 阻止启动 |
+
+上述数值是当前 POC 默认门禁，不代表所有模型都使用同一门槛。每个本地模型必须随离线包提供版本化规格清单，至少包含模型、量化、上下文、GPU 架构、最低显存、最低内存、磁盘需求、运行时版本和权重哈希。选择更大模型或更长上下文时，以模型清单中的更高要求为准。
+
+预检报告示例：
+
+```text
+Air-Gapped preflight: FAILED
+CPU cores       current=8       required>=16   FAIL
+Memory          current=32GB    required>=64GB FAIL
+GPU VRAM        current=none    required>=24GB FAIL
+Result: local model and Agent Runtime were not started.
+```
+
+不得提供跳过生产预检的参数。当前 Intel Mac 执行该预检时应失败，这是预期行为；它仍可使用 `cloud-dev` 或显式 Mock Profile 开发非离线能力。
 
 ## 小规模生产建议
 
@@ -70,6 +102,7 @@
 - 事件和并发用户数量。
 - 模型参数量、量化方式和上下文长度。
 - 模型并发、首 Token 延迟和目标吞吐。
+- 模型规格清单、硬件预检报告和安全余量。
 
 日志存储初步估算：
 
@@ -83,4 +116,3 @@
 
 - [K3s 硬件要求](https://docs.k3s.io/installation/requirements)
 - [vLLM GPU 支持要求](https://docs.vllm.ai/en/v0.22.0/getting_started/installation/gpu/)
-

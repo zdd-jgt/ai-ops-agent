@@ -51,7 +51,8 @@
 - 事件中心：独立服务和 PostgreSQL。
 - Agent 工具：自建本地 MCP Server；开发使用 `stdio`，Kubernetes 内部使用 Streamable HTTP。
 - Agent Runtime：优先验证 Mastra Workflow、MCP、PostgreSQL、OpenTelemetry 和 Scorers。
-- 模型：统一模型网关；AWS 版优先 Bedrock，私有化版使用本地推理服务。
+- 模型：统一可插拔模型网关；云上产品支持客户配置 Provider，DeepSeek API 和 Qwen API 只是开发阶段首批适配器，正式 AWS 交付保留 Bedrock 等原生适配；完全断网版使用本地推理服务。
+- Air-Gapped 启动前必须执行主机与所选模型的兼容性预检；低于最低配置、无法确认关键资源或缺少离线权重时失败退出，不允许自动切换云模型或低规格 CPU 模式。
 
 ## 实施约束
 
@@ -66,12 +67,11 @@
 
 - `docs/README.md`：完整阅读顺序。
 - `docs/需求大纲.md`：整体规划、阶段路线和统一需求模板。
+- `docs/phases/README.md`：分期文档规范与阶段索引。
+- `docs/phases/phase-0/README.md`：阶段 0 技术验证入口。
+- `docs/phases/phase-1/README.md`：第一期完整文档入口。
 - `docs/01-target-architecture.md`：目标架构。
-- `docs/02-phase-1-scope.md`：第一期范围。
 - `docs/03-private-deployment-and-air-gap.md`：私有化与完全断网。
-- `docs/08-local-mcp-server.md`：MCP Server 与工具边界。
-- `docs/09-domain-model-and-glossary.md`：领域模型与术语。
-- `docs/10-security-threat-model.md`：安全威胁模型。
-- `docs/11-non-functional-requirements.md`：非功能要求。
-- `docs/12-test-and-evaluation-plan.md`：测试与评估。
-- `docs/13-agent-runtime-design.md`：Mastra Agent Runtime 候选方案。
+- `docs/phases/phase-1/local-mcp-server.md`：MCP Server 与工具边界。
+- `docs/phases/phase-1/security-threat-model.md`：第一期安全基线。
+- `docs/phases/phase-0/agent-runtime-design.md`：Mastra Agent Runtime 候选方案。

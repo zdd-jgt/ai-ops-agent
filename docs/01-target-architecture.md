@@ -8,7 +8,7 @@
 
 - 部署在客户 AWS 账户或确定的 SaaS/托管边界内。
 - 接入 CloudWatch、CloudTrail、AWS Config、EKS、RDS、ALB、WAF、Security Hub 等数据。
-- 模型优先通过统一模型网关接入 Amazon Bedrock，也可扩展 SageMaker 或自建推理服务。
+- 云上版本通过可插拔模型网关支持客户选择 Provider；DeepSeek API 和 Qwen API 作为开发阶段首批验证适配器，正式 AWS 交付保留 Amazon Bedrock、SageMaker、OpenAI-compatible 服务或其他批准的原生适配器。
 - 使用 AWS 身份、网络、密钥、对象存储和高可用能力。
 
 ### 本地私有化版
@@ -16,6 +16,7 @@
 - 部署在客户 Kubernetes 或本地服务器环境中。
 - 支持私有化联网和完全断网两种运行 Profile。
 - 模型、知识库、可观测后端、事件中心和审计全部可在本地运行。
+- 完全断网 Profile 在模型与 Agent 启动前强制执行主机、运行时和模型权重预检，失败时停止启动且不回退云端。
 - 支持 Kubernetes、虚拟机、物理机和传统中间件。
 
 两者共享产品代码、协议和安装规范，但默认不存在运行时数据通道。

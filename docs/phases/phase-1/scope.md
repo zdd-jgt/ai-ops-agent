@@ -60,6 +60,9 @@
 
 ### Agent Runtime 与 MCP
 
+- 云上模型网关提供 Provider 注册与能力声明机制，支持客户配置经过批准的模型服务；开发阶段先用 DeepSeek API 和 Qwen API 完成适配和回归验证。
+- 第一阶段至少支持 OpenAI-compatible 自定义 Provider，通过服务端密钥引用配置 Base URL、模型名称和 API Key。
+- Air-Gapped 启动前执行主机和模型兼容性预检，未达到最低配置时失败退出。
 - 实现一个模块化本地 MCP Server。
 - 本地开发支持 `stdio`，Kubernetes 部署支持内部 Streamable HTTP。
 - 第一批适配器覆盖事件中心、Prometheus 和 Kubernetes。
@@ -104,3 +107,4 @@
 - 诊断 Workflow 可以在中断后恢复，不重复创建事件或重复执行已完成步骤。
 - 所有 MCP 工具调用都可审计，越权、超范围和任意命令请求被拒绝。
 - 完全断网验证中不产生公网 DNS、HTTP、模型或遥测请求。
+- 离线硬件预检失败时不启动模型和 Agent Runtime，也不自动回退到云端或低规格模式。
