@@ -1,0 +1,32 @@
+{
+  "name": "@ai-ops/mcp-server",
+  "version": "0.1.0",
+  "private": true,
+  "description": "智能运维大脑 — 本地 MCP Server（受控只读诊断工具）",
+  "type": "module",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./policy": "./src/policy/index.ts",
+    "./tools/frontend-observability": "./src/tools/frontend-observability/index.ts",
+    "./tools/*": "./src/tools/*"
+  },
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@ai-ops/auth-contracts": "workspace:*",
+    "@ai-ops/telemetry-contracts": "workspace:*",
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.8.0",
+    "vitest": "^4.1.10"
+  }
+}

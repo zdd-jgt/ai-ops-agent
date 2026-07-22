@@ -1,0 +1,21 @@
+{
+  "name": "ai-ops-agent",
+  "version": "0.0.0",
+  "private": true,
+  "description": "智能运维大脑 — AI Ops Agent Monorepo",
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=10.0.0"
+  },
+  "packageManager": "pnpm@10.32.0",
+  "scripts": {
+    "dev": "pnpm --recursive --parallel dev",
+    "build": "pnpm --recursive build",
+    "test": "pnpm --recursive test",
+    "test:e2e": "pnpm --recursive test:e2e",
+    "lint": "pnpm typecheck",
+    "typecheck": "pnpm --recursive typecheck",
+    "clean": "pnpm --recursive clean"
+  }
+}

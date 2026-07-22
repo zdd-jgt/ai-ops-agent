@@ -1,0 +1,15 @@
+# 本地开发/测试用 Docker Compose
+# 仅用于验证容器构建和 stdout 日志输出，不依赖 AWS 资源
+
+services:
+  telemetry-api:
+    build:
+      context: ../../..
+      dockerfile: deploy/local/telemetry/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    # 本地开发不启用 awslogs，直接看 docker logs
+    restart: unless-stopped

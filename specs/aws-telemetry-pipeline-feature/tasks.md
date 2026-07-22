@@ -1,0 +1,89 @@
+# AWS Telemetry Pipeline Feature Tasks
+
+- [x] T-PIPE-001: 创建 Telemetry API 骨架和批次接入契约 ~1h
+  - role: backend
+  - depends_on: F-001 complete
+  - owned_paths: apps/telemetry-api/src/ingest/**, apps/telemetry-api/src/index.ts
+  - shared_files: packages/telemetry-contracts/**, package.json
+  - risk: medium
+  - qa_level: QA-2
+  - review_required: yes
+  - acceptance: AC-PIPE-001
+  - test_cases: TC-PIPE-001
+  - verify: not_configured — 使用 F-001 建立的项目测试命令
+  - visual_required: no
+  - rollback_or_blocker: API 框架未确认时先固化 HTTP 契约，不引入重型框架
+
+- [x] T-PIPE-002: 实现清洗、标准化、去重和数据策略 ~1h
+  - role: backend
+  - depends_on: T-PIPE-001
+  - owned_paths: apps/telemetry-api/src/cleaner/**, apps/telemetry-api/src/policy/**
+  - shared_files: packages/telemetry-contracts/**
+  - risk: high
+  - qa_level: QA-3
+  - review_required: yes
+  - acceptance: AC-PIPE-002, AC-PIPE-003
+  - test_cases: TC-PIPE-002, TC-PIPE-003
+  - verify: 敏感数据、边界载荷和重复事件聚焦测试
+  - visual_required: no
+  - rollback_or_blocker: 禁止字段泄漏即阻塞
+
+- [x] T-PIPE-003: 实现 Local/Structured Log Sink 与 CloudWatch Query Adapter ~1h
+  - role: backend
+  - depends_on: T-PIPE-002
+  - owned_paths: apps/telemetry-api/src/sinks/**, apps/telemetry-api/src/query/**
+  - shared_files: packages/telemetry-contracts/**
+  - risk: high
+  - qa_level: QA-3
+  - review_required: yes
+  - acceptance: AC-PIPE-003, AC-PIPE-004, AC-PIPE-005, AC-PIPE-006
+  - test_cases: TC-PIPE-003, TC-PIPE-004, TC-PIPE-005, TC-PIPE-006
+  - verify: AWS SDK Mock 和固定查询模板测试；不调用真实 AWS
+  - visual_required: no
+  - rollback_or_blocker: 任意查询文本必须在接口层不可表达
+
+- [x] T-PIPE-004: 准备本地 Docker 与 AWS ECS/Fargate 配置 ~1h
+  - role: ops
+  - environment: local/plan-only
+  - operation_mode: prepare-only
+  - depends_on: T-PIPE-003
+  - owned_paths: deploy/local/telemetry/**, infra/aws/telemetry/**
+  - shared_files: none
+  - risk: high
+  - qa_level: QA-3
+  - review_required: yes
+  - acceptance: AC-PIPE-006
+  - test_cases: TC-PIPE-006
+  - verify: 配置静态检查和本地容器验证；真实命令待脚手架确定
+  - visual_required: no
+  - rollback_or_blocker: 只准备配置，不创建 AWS 资源
+
+- [x] T-PIPE-005: 完成 Pipeline 契约、安全和韧性回归 ~1h
+  - role: qa
+  - depends_on: T-PIPE-003, T-PIPE-004
+  - owned_paths: apps/telemetry-api/tests/**, packages/telemetry-contracts/fixtures/**
+  - shared_files: none
+  - risk: high
+  - qa_level: QA-3
+  - review_required: yes
+  - acceptance: AC-PIPE-001, AC-PIPE-002, AC-PIPE-004, AC-PIPE-005, AC-PIPE-006
+  - test_cases: TC-PIPE-001, TC-PIPE-002, TC-PIPE-004, TC-PIPE-005, TC-PIPE-006
+  - verify: 实际测试命令配置后记录结果
+  - visual_required: no
+  - rollback_or_blocker: 安全门禁失败不得进入云验证
+
+- [!] T-PIPE-006: 部署开发环境 ECS 并验证 CloudWatch 链路 ~1h
+  - role: ops
+  - environment: aws-development
+  - operation_mode: requires-confirmation
+  - depends_on: T-PIPE-005
+  - owned_paths: infra/aws/telemetry/**, docs/phases/phase-1/release-and-rollback.md
+  - shared_files: none
+  - risk: high
+  - qa_level: QA-3
+  - review_required: yes
+  - acceptance: AC-PIPE-007
+  - test_cases: TC-PIPE-007
+  - verify: 获得环境、区域、预算和部署批准后记录真实 ECS/CloudWatch 证据
+  - visual_required: no
+  - rollback_or_blocker: 阻塞于用户对付费 AWS 资源、目标账户、区域、域名和回滚范围的明确确认

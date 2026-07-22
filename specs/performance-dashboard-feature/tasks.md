@@ -1,0 +1,71 @@
+# Performance Dashboard Feature Tasks
+
+- [x] T-DASH-001: 创建 Web 骨架、Query Client 和过滤状态 ~1h
+  - role: frontend
+  - depends_on: F-002 query contract complete
+  - owned_paths: apps/web/src/app/**, apps/web/src/features/observability/api/**, apps/web/src/features/observability/filters/**
+  - shared_files: package.json, pnpm-workspace.yaml
+  - risk: medium
+  - qa_level: QA-2
+  - review_required: yes
+  - acceptance: AC-DASH-001, AC-DASH-006
+  - test_cases: TC-DASH-001, TC-DASH-006
+  - verify: not_configured — 选择 Web 测试栈后记录实际命令
+  - visual_required: yes
+  - rollback_or_blocker: Web 框架和组件基线未确认时只创建最小无样式骨架
+
+- [x] T-DASH-002: 实现 Web Vitals 卡片、趋势和慢页面 ~1h
+  - role: frontend
+  - depends_on: T-DASH-001
+  - owned_paths: apps/web/src/features/observability/performance/**
+  - shared_files: apps/web/src/features/observability/api/**
+  - risk: medium
+  - qa_level: QA-2
+  - review_required: yes
+  - acceptance: AC-DASH-002, AC-DASH-003
+  - test_cases: TC-DASH-002, TC-DASH-003
+  - verify: Fixture 驱动组件测试与阈值边界测试
+  - visual_required: yes
+  - rollback_or_blocker: 样本数缺失时不得展示评级
+
+- [x] T-DASH-003: 实现错误趋势、日志搜索和 Evidence 详情 ~1h
+  - role: frontend
+  - depends_on: T-DASH-001
+  - owned_paths: apps/web/src/features/observability/logs/**
+  - shared_files: apps/web/src/features/observability/api/**
+  - risk: high
+  - qa_level: QA-3
+  - review_required: yes
+  - acceptance: AC-DASH-003, AC-DASH-004, AC-DASH-006
+  - test_cases: TC-DASH-003, TC-DASH-004, TC-DASH-006
+  - verify: XSS/转义、过滤、详情和字段白名单测试
+  - visual_required: yes
+  - rollback_or_blocker: 原始 HTML 或禁止字段可渲染时阻塞
+
+- [x] T-DASH-004: 实现异步状态、取消旧请求和可访问反馈 ~1h
+  - role: frontend
+  - depends_on: T-DASH-002, T-DASH-003
+  - owned_paths: apps/web/src/features/observability/states/**, apps/web/src/features/observability/**
+  - shared_files: apps/web/src/features/observability/api/**
+  - risk: medium
+  - qa_level: QA-2
+  - review_required: yes
+  - acceptance: AC-DASH-005
+  - test_cases: TC-DASH-005
+  - verify: pending/partial/timeout/429/403 和竞态测试
+  - visual_required: yes
+  - rollback_or_blocker: 状态不明确会误导运维结论时阻塞
+
+- [x] T-DASH-005: 完成 Dashboard 自动化与视觉回归证据 ~1h
+  - role: qa
+  - depends_on: T-DASH-004
+  - owned_paths: apps/web/tests/**, test-results/**
+  - shared_files: apps/web/**
+  - risk: medium
+  - qa_level: QA-2
+  - review_required: yes
+  - acceptance: AC-DASH-001, AC-DASH-002, AC-DASH-004, AC-DASH-005, AC-DASH-006
+  - test_cases: TC-DASH-001, TC-DASH-002, TC-DASH-004, TC-DASH-005, TC-DASH-006
+  - verify: 测试工具确定后记录真实组件/E2E/截图命令
+  - visual_required: yes
+  - rollback_or_blocker: 未确认浏览器测试工具时不得伪造视觉证据

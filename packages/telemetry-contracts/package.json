@@ -1,0 +1,28 @@
+{
+  "name": "@ai-ops/telemetry-contracts",
+  "version": "1.0.0",
+  "private": true,
+  "description": "版本化前端遥测事件 Schema、类型定义、错误码与测试夹具",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./v1": "./src/schemas/v1.ts",
+    "./types": "./src/types.ts",
+    "./error-codes": "./src/error-codes.ts",
+    "./fixtures": "./src/__fixtures__/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.0",
+    "vitest": "^4.1.10"
+  }
+}

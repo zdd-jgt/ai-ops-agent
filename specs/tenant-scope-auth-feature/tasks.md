@@ -1,0 +1,57 @@
+# Tenant Scope Authentication Feature Tasks
+
+- [ ] T-AUTH-001: 建立共享身份契约与 Write Key Registry ~1h
+  - role: backend
+  - depends_on: F-002 local implementation
+  - owned_paths: packages/auth-contracts/**, apps/telemetry-api/src/policy/**, packages/telemetry-contracts/**
+  - shared_files: pnpm-lock.yaml, pnpm-workspace.yaml
+  - risk: critical
+  - qa_level: QA-4
+  - review_required: yes
+  - acceptance: AC-AUTH-001, AC-AUTH-002
+  - test_cases: TC-AUTH-001, TC-AUTH-002, TC-AUTH-003
+  - verify: 共享认证与 Write Key 聚焦单元测试、TypeScript 检查
+  - visual_required: no
+  - rollback_or_blocker: 不读取真实 Key；生产配置缺失必须失败关闭
+
+- [ ] T-AUTH-002: 强制 Telemetry Query、Evidence 与 Model API 身份和 Scope ~1h
+  - role: backend
+  - depends_on: T-AUTH-001
+  - owned_paths: apps/telemetry-api/src/index.ts, apps/telemetry-api/src/ingest/**, apps/telemetry-api/src/query/**, apps/telemetry-api/src/model-router.ts, apps/telemetry-api/src/lib/**, apps/telemetry-api/tests/**
+  - shared_files: packages/telemetry-contracts/**
+  - risk: critical
+  - qa_level: QA-4
+  - review_required: yes
+  - acceptance: AC-AUTH-001, AC-AUTH-002, AC-AUTH-003, AC-AUTH-006
+  - test_cases: TC-AUTH-003, TC-AUTH-004, TC-AUTH-005, TC-AUTH-006
+  - verify: Telemetry API 安全集成测试、全仓类型检查
+  - visual_required: no
+  - rollback_or_blocker: 匿名或跨 Scope 查询成功即阻塞
+
+- [ ] T-AUTH-003: 贯通 Agent 与 MCP tenant Scope 和最小环境 ~1h
+  - role: backend
+  - depends_on: T-AUTH-002
+  - owned_paths: apps/agent-runtime/src/**, apps/agent-runtime/tests/**, apps/mcp-server/src/**, apps/mcp-server/tests/**
+  - shared_files: packages/auth-contracts/**
+  - risk: critical
+  - qa_level: QA-4
+  - review_required: yes
+  - acceptance: AC-AUTH-004, AC-AUTH-005
+  - test_cases: TC-AUTH-007, TC-AUTH-008, TC-AUTH-009
+  - verify: Agent/MCP 聚焦安全测试、三服务本地 E2E
+  - visual_required: no
+  - rollback_or_blocker: tenant 可由请求体或模型扩大、子进程泄露无关 Key 即阻塞
+
+- [ ] T-AUTH-004: 同步开发调用、配置文档并完成安全回归 ~1h
+  - role: qa
+  - depends_on: T-AUTH-003
+  - owned_paths: apps/web/src/**, apps/web/tests/**, apps/web/e2e/**, .env.example, README.md, docs/phases/phase-1/**
+  - shared_files: specs/xj-feature-plan.md
+  - risk: high
+  - qa_level: QA-4
+  - review_required: yes
+  - acceptance: AC-AUTH-001, AC-AUTH-002, AC-AUTH-003, AC-AUTH-004, AC-AUTH-005, AC-AUTH-006
+  - test_cases: TC-AUTH-001, TC-AUTH-002, TC-AUTH-003, TC-AUTH-004, TC-AUTH-005, TC-AUTH-006, TC-AUTH-007, TC-AUTH-008, TC-AUTH-009
+  - verify: pnpm typecheck、pnpm test、pnpm test:e2e、pnpm build；记录未覆盖的生产 OIDC 门禁
+  - visual_required: no
+  - rollback_or_blocker: 浏览器开发 Token 不得描述为生产认证；任何安全回归失败即阻塞

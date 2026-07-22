@@ -1,0 +1,44 @@
+{
+  "$schema": "https://raw.githubusercontent.com/aws/aws-cdk/main/packages/@aws-cdk/aws-ecs/lib/task-definition.json",
+  "$description": "Telemetry API ECS Fargate Task Definition — prepare-only，未经确认不部署",
+  "family": "aiops-telemetry-api",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
+  "executionRoleArn": "arn:aws:iam::ACCOUNT_ID:role/aiops-telemetry-execution",
+  "taskRoleArn": "arn:aws:iam::ACCOUNT_ID:role/aiops-telemetry-task",
+  "containerDefinitions": [
+    {
+      "name": "telemetry-api",
+      "image": "ACCOUNT_ID.dkr.ecr.REGION.amazonaws.com/aiops-telemetry-api:latest",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 3000,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        { "name": "NODE_ENV", "value": "production" },
+        { "name": "PORT", "value": "3000" }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/aiops/telemetry-api",
+          "awslogs-region": "REGION",
+          "awslogs-stream-prefix": "telemetry-api",
+          "awslogs-create-group": "true"
+        }
+      },
+      "healthCheck": {
+        "command": ["CMD-SHELL", "curl -f http://localhost:3000/health || exit 1"],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 10
+      }
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+# Ops Log Chat Feature Tasks
+
+- [x] T-CHAT-001: 定义四个只读 MCP 工具 Schema 和 Telemetry Adapter ~1h
+  - role: backend
+  - depends_on: F-002 query contract complete
+  - owned_paths: apps/mcp-server/src/tools/frontend-observability/**
+  - shared_files: packages/telemetry-contracts/**
+  - risk: high
+  - qa_level: QA-3
+  - review_required: yes
+  - acceptance: AC-CHAT-001, AC-CHAT-002
+  - test_cases: TC-CHAT-001, TC-CHAT-002
+  - verify: not_configured — MCP 契约与权限测试命令由项目骨架确定
+  - visual_required: no
+  - rollback_or_blocker: 任意底层查询参数不得出现在公开 Schema
+
+- [x] T-CHAT-002: 实现 Scope、时间、预算、裁剪和拒绝策略 ~1h
+  - role: backend
+  - depends_on: T-CHAT-001
+  - owned_paths: apps/mcp-server/src/policy/**, apps/mcp-server/src/tools/frontend-observability/**
+  - shared_files: none
+  - risk: high
+  - qa_level: QA-3
+  - review_required: yes
+  - acceptance: AC-CHAT-002, AC-CHAT-005
+  - test_cases: TC-CHAT-002, TC-CHAT-005
+  - verify: 越权、超范围、注入和结果裁剪测试
+  - visual_required: no
+  - rollback_or_blocker: 任何绕过服务端 Scope 的路径即阻塞
+
+- [x] T-CHAT-003: 实现确定性诊断 Workflow 和 Ops Chat Agent ~1h
+  - role: backend
+  - depends_on: T-CHAT-002, stage-0 runtime decision
+  - owned_paths: apps/agent-runtime/src/workflows/frontend-diagnosis/**, apps/agent-runtime/src/agents/ops-chat/**
+  - shared_files: apps/mcp-server/src/tools/frontend-observability/**
+  - risk: high
+  - qa_level: QA-3
+  - review_required: yes
+  - acceptance: AC-CHAT-003, AC-CHAT-004, AC-CHAT-005
+  - test_cases: TC-CHAT-003, TC-CHAT-004, TC-CHAT-005
+  - verify: Mock Provider + MCP Fixture，不调用真实付费模型
+  - visual_required: no
+  - rollback_or_blocker: Mastra 未通过阶段 0 时改用项目接口的最小替身，不绑定私有类型
+
+- [x] T-CHAT-004: 实现聊天 UI、工具状态和 Evidence 展示 ~1h
+  - role: frontend
+  - depends_on: T-CHAT-003, F-003 complete
+  - owned_paths: apps/web/src/features/ops-chat/**
+  - shared_files: apps/web/src/app/**, apps/web/src/features/observability/**
+  - risk: medium
+  - qa_level: QA-2
+  - review_required: yes
+  - acceptance: AC-CHAT-006
+  - test_cases: TC-CHAT-006
+  - verify: 组件/E2E/视觉命令确定后记录
+  - visual_required: yes
+  - rollback_or_blocker: Evidence、时间范围和失败状态缺失时不允许只展示自然语言答案
+
+- [x] T-CHAT-005: 建立 Golden Questions、Provider 与注入回归 ~1h
+  - role: qa
+  - depends_on: T-CHAT-003, T-CHAT-004
+  - owned_paths: apps/agent-runtime/tests/golden/**, apps/mcp-server/tests/**, apps/web/tests/ops-chat/**
+  - shared_files: none
+  - risk: high
+  - qa_level: QA-3
+  - review_required: yes
+  - acceptance: AC-CHAT-001, AC-CHAT-002, AC-CHAT-003, AC-CHAT-004, AC-CHAT-005, AC-CHAT-006
+  - test_cases: TC-CHAT-001, TC-CHAT-002, TC-CHAT-003, TC-CHAT-004, TC-CHAT-005, TC-CHAT-006
+  - verify: Mock 必跑；真实 DeepSeek/Qwen 调用需单独确认费用并记录脱敏证据
+  - visual_required: yes
+  - rollback_or_blocker: 安全确定性测试失败时 LLM 评分不能放行

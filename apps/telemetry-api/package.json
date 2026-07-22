@@ -1,0 +1,29 @@
+{
+  "name": "@ai-ops/telemetry-api",
+  "version": "0.1.0",
+  "private": true,
+  "description": "遥测接入服务 — Hono + ECS，接收前端 SDK 批次并写入 CloudWatch Logs",
+  "type": "module",
+  "main": "./src/index.ts",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "node --import tsx src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@ai-ops/auth-contracts": "workspace:*",
+    "@ai-ops/telemetry-contracts": "workspace:*",
+    "@hono/node-server": "^1.13.0",
+    "@hono/zod-validator": "^0.4.0",
+    "hono": "^4.7.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.8.0",
+    "vitest": "^4.1.10"
+  }
+}

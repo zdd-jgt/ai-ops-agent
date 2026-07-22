@@ -27,6 +27,8 @@ certs/local/
 # Logs, runtime files and temporary files
 *.log
 logs/
+!packages/web-telemetry-sdk/src/collectors/logs/
+!packages/web-telemetry-sdk/src/collectors/logs/**
 *.pid
 *.pid.lock
 tmp/
@@ -111,4 +113,3 @@ kubeconfig.*
 *.kubeconfig
 rendered-manifests/
 charts/*.tgz
-

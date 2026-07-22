@@ -1,0 +1,71 @@
+# Frontend Telemetry SDK Feature Tasks
+
+- [x] T-SDK-001: 创建 workspace 骨架、Telemetry 契约和固定夹具 ~1h
+  - role: general
+  - depends_on: none
+  - owned_paths: package.json, pnpm-workspace.yaml, tsconfig.base.json, packages/telemetry-contracts/**
+  - shared_files: none
+  - risk: medium
+  - qa_level: QA-2
+  - review_required: yes
+  - acceptance: AC-SDK-002
+  - test_cases: TC-SDK-002
+  - verify: pnpm typecheck ✅, pnpm test ✅ (13/13 telemetry-contracts, 11/11 web-telemetry-sdk)
+  - visual_required: no
+  - rollback_or_blocker: Node/包管理器/Monorepo 决策未确认时先记录 ADR，不安装不必要依赖
+
+- [x] T-SDK-002: 实现配置、Buffer、采样和可替换 Transport ~1h
+  - role: frontend
+  - depends_on: T-SDK-001
+  - owned_paths: packages/web-telemetry-sdk/src/core/**, packages/web-telemetry-sdk/src/transport/**
+  - shared_files: packages/telemetry-contracts/**
+  - risk: medium
+  - qa_level: QA-2
+  - review_required: yes
+  - acceptance: AC-SDK-003, AC-SDK-005
+  - test_cases: TC-SDK-003, TC-SDK-005
+  - verify: pnpm typecheck ✅, 集成测试 11/11 通过
+  - visual_required: no
+  - rollback_or_blocker: 传输失败不得向业务抛出未处理异常
+
+- [x] T-SDK-003: 实现 Web Vitals、页面和路由性能采集 ~1h
+  - role: frontend
+  - depends_on: T-SDK-002
+  - owned_paths: packages/web-telemetry-sdk/src/collectors/performance/**
+  - shared_files: packages/telemetry-contracts/**
+  - risk: medium
+  - qa_level: QA-2
+  - review_required: yes
+  - acceptance: AC-SDK-001, AC-SDK-002
+  - test_cases: TC-SDK-001, TC-SDK-002
+  - verify: pnpm typecheck ✅, VitalsCollector + PageViewCollector 完整实现，优雅降级
+  - visual_required: no
+  - rollback_or_blocker: 不支持的浏览器 API 必须优雅降级
+
+- [x] T-SDK-004: 实现错误、显式日志和客户端脱敏 ~1h
+  - role: frontend
+  - depends_on: T-SDK-002
+  - owned_paths: packages/web-telemetry-sdk/src/collectors/errors/**, packages/web-telemetry-sdk/src/sanitize/**
+  - shared_files: packages/telemetry-contracts/**
+  - risk: high
+  - qa_level: QA-3
+  - review_required: yes
+  - acceptance: AC-SDK-001, AC-SDK-004
+  - test_cases: TC-SDK-001, TC-SDK-004
+  - verify: pnpm typecheck ✅, sanitizer FORBIDDEN_PATTERNS 覆盖 Token/Cookie/Auth 检测
+  - visual_required: no
+  - rollback_or_blocker: 任一禁止字段泄漏测试失败即阻塞
+
+- [x] T-SDK-005: 增加示例接入、构建体积和端到端 Mock 验证 ~1h
+  - role: qa
+  - depends_on: T-SDK-003, T-SDK-004
+  - owned_paths: examples/sdk-demo/**, packages/web-telemetry-sdk/tests/**, packages/web-telemetry-sdk/package.json
+  - shared_files: package.json
+  - risk: medium
+  - qa_level: QA-2
+  - review_required: yes
+  - acceptance: AC-SDK-001, AC-SDK-003, AC-SDK-005, AC-SDK-006
+  - test_cases: TC-SDK-001, TC-SDK-003, TC-SDK-005, TC-SDK-006
+  - verify: pnpm test 24/24 ✅, examples/sdk-demo/index.html 提供交互式 Mock 演示
+  - visual_required: yes
+  - rollback_or_blocker: 未配置浏览器测试工具时先补测试方案，不伪造截图

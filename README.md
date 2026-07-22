@@ -1,64 +1,112 @@
-# 智能运维大脑（AI Ops Agent）
+# AI Ops Agent
 
-智能运维大脑是一套面向 AWS 云上与完全离线私有化环境的企业级 AI Ops 平台。系统统一分析指标、日志、链路、告警、资源拓扑、变更记录和运维知识，提供异常聚合、辅助根因定位、性能与安全建议、事件跟踪以及受控自动化运维能力。
+一个面向前端可观测性的只读智能运维 MVP。浏览器 SDK 采集 Web Vitals、错误和日志，Telemetry API 完成校验、脱敏、去重与固定模板查询；Agent Runtime 通过独立的 MCP stdio 进程调用受控工具，并在 Web 页面展示诊断步骤与真实 Evidence。
 
-## 项目状态
+## 当前状态
 
-当前处于产品与架构设计阶段，尚未进入正式编码。现有内容用于明确范围、风险、数据契约和第一期验收标准，不代表已经具备生产能力。
+- 本地核心链路已实现，并完成针对 review 问题的修复。
+- `pnpm test`：98 个测试通过。
+- `pnpm typecheck`、`pnpm lint`：通过；当前 `lint` 是 TypeScript 静态检查别名，尚未接入 ESLint。
+- Web 生产构建通过，但存在单个 chunk 大于 500 kB 的警告。
+- Agent→MCP→Query API 端到端冒烟通过；零样本时返回 `partial`，不会伪造“无异常”。
+- 本地 Chrome 桌面/移动 E2E 与视觉基线已完成；AWS、真实付费模型和 Air-Gapped 验证尚未完成，不能视为生产交付。
 
-## 核心目标
-
-- AWS 云上版与本地私有化版独立部署。
-- 私有化版本支持完全断网运行。
-- 以 Kubernetes 为主要环境，同时兼容虚拟机、物理机和传统服务。
-- 聚合告警并建立内部事件中心。
-- 基于拓扑、变更和历史证据生成可复核的根因候选。
-- 第一阶段只读诊断，生产写操作必须经过审批、策略和审计。
-- 通过本地 MCP Server 向 Agent 暴露受控工具，不暴露任意 Shell、SQL、SSH 或 kubectl。
-
-## 第一期闭环
+## 项目结构
 
 ```text
-遥测与告警接入
-  -> 标准化、去重和事件聚合
-  -> 补齐服务、拓扑和变更上下文
-  -> Agent 调用受控 MCP 工具收集证据
-  -> 输出根因候选、置信度和处理建议
-  -> 人工确认与事件跟踪
-  -> 恢复验证和经验沉淀
+apps/
+  telemetry-api/   Hono 接入与固定模板 Query API，默认端口 3000
+  mcp-server/      4 个只读 MCP 工具及 Scope/Budget 策略
+  agent-runtime/   诊断 Workflow 与 HTTP API，默认端口 3002
+  web/             React 监控面板和运维聊天，默认端口 5173
+packages/
+  auth-contracts/       Principal、Bearer Registry 与服务端 Scope 契约
+  telemetry-contracts/  共享 Zod 事件契约
+  web-telemetry-sdk/    采集、脱敏、Buffer、重试和 Beacon
+examples/sdk-demo/      SDK 接入示例
+docs/                   架构、阶段和安全设计
+specs/                  Feature requirements/design/tasks/test-cases
+infra/aws/              仅准备的 AWS 配置，未部署
 ```
 
-## 推荐技术方向
+## 本地启动
 
-- OpenTelemetry、Prometheus、Loki、Tempo、Grafana、Alertmanager。
-- PostgreSQL 作为事件中心和结构化状态存储。
-- Mastra 作为第一期 Agent Runtime 候选，需通过本地与完全断网技术验证。
-- 云上版本通过可插拔模型网关支持客户选择模型 Provider；DeepSeek API 和 Qwen API 只是开发阶段的首批验证适配器，正式 AWS 交付继续保留 Amazon Bedrock 等原生适配能力。
-- 完全断网版只连接本地模型服务，启动前执行主机硬件与运行环境预检，低于所选模型最低要求时阻止启动。
-- 本地开发使用 MCP `stdio`，Kubernetes 内部使用 Streamable HTTP。
+要求 Node.js 22+、pnpm 10+。本机建议使用 Volta Node，避免系统 Node 版本过旧。
 
-## 模型接入（规划）
+```bash
+pnpm install
+cp .env.example .env
+```
 
-当前项目尚处于设计阶段，以下能力尚未实现，但已经纳入第一阶段范围。
+至少确认以下配置：
 
-### 云端模型
+```dotenv
+TELEMETRY_API_URL=http://localhost:3000
+TELEMETRY_QUERY_TOKEN=dev-mcp-token
+AIOPS_AUTH_TOKENS_JSON=[...]
+TELEMETRY_WRITE_KEYS_JSON=[...]
+AIOPS_CORS_ORIGINS=http://localhost:5173
+MCP_TENANT_ID=dev-tenant
+MCP_ALLOWED_APP_IDS=demo-app
+MCP_ALLOWED_ENVIRONMENTS=development,staging,production
+AGENT_RUNTIME_PORT=3002
+VITE_AIOPS_DEV_TOKEN=dev-console-token
+```
 
-- 模型网关采用 Provider 插件机制，不把产品绑定到 DeepSeek、Qwen 或单一云厂商。
-- DeepSeek 和 Qwen 使用项目开发者自己的 API Key，作为首批适配和回归测试模型。
-- 客户可以配置自己的 OpenAI-compatible 服务，包括 Base URL、模型名称和服务端 API Key 引用。
-- 不兼容 OpenAI 协议的服务通过独立原生 Provider Adapter 接入，例如后续的 Amazon Bedrock。
-- 新 Provider 必须先通过连通性、结构化输出、Tool Calling、超时和 Golden Incidents 测试，才能启用。
-- API Key 只能保存在服务端环境变量或密钥系统中，不得进入浏览器、日志、Prompt、Trace 或 Git。
+分别启动三个终端：
 
-### 本地离线模型
+```bash
+pnpm --filter @ai-ops/telemetry-api dev
+pnpm --filter @ai-ops/agent-runtime dev
+pnpm --filter @ai-ops/web dev
+```
 
-本地模型权重不进入代码仓库和应用镜像，支持两种使用方式：
+打开 `http://localhost:5173`。Agent Runtime 会为每轮诊断自动启动短生命周期 MCP stdio 子进程，不需要单独启动 MCP HTTP 服务。
 
-1. 使用规划中的 `aiops model import <离线模型包>` 导入默认目录 `/opt/aiops/models/`。
-2. 在部署配置中指定客户已有的模型绝对路径，并以只读方式挂载给推理服务。
+健康检查：
 
-Air-Gapped 模式不会自动联网下载模型。启动前必须验证模型清单、权重哈希、CPU、内存、GPU、显存、磁盘和运行时兼容性；任一必需项不满足时，本地模型和 Agent Runtime 都不会启动，也不会回退到云端模型。
+```bash
+curl http://localhost:3000/health
+curl http://localhost:3002/healthz
+```
 
-## 文档
+诊断请求示例：
 
-完整设计入口见 [docs/README.md](docs/README.md)。项目关键上下文和开发约束见 [AGENTS.md](AGENTS.md)。
+```bash
+curl -X POST http://localhost:3002/v1/diagnosis \
+  -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer dev-console-token' \
+  -d '{
+    "question":"首页最近有异常吗？",
+    "appId":"demo-app",
+    "environment":"production"
+  }'
+```
+
+## 验证命令
+
+```bash
+pnpm test
+pnpm test:e2e
+pnpm typecheck
+pnpm lint
+pnpm --filter @ai-ops/web build
+```
+
+## 安全边界
+
+- Phase 1 仅允许只读诊断工具，不提供任意 Shell、SQL、SSH、kubectl 或写操作。
+- 第一阶段采用单组织、多应用、多环境；`tenantId` 由服务端 Bearer/Write Key Registry 派生，不能由浏览器或模型扩权。
+- MCP Server 从服务端环境变量派生 tenant/app/environment Scope，并限制时间范围和单轮调用次数。
+- Query、Evidence、Model 与 Agent API 强制认证/RBAC；SDK Write Key 绑定 tenant/app/environment/Origin。
+- MCP 子进程只继承显式白名单配置，不继承 DeepSeek/Qwen 等模型 API Key。
+- `.env` 已被 Git 忽略；不得提交真实 API Key、Token 或客户数据。
+- AWS 部署、付费模型调用和生产环境变更必须另行确认成本、目标账户、回滚方案与验证范围。
+
+## 已知未完成项
+
+1. 自动化可访问性专项审计，以及 macOS 之外的视觉基线。
+2. Web chunk 拆分与性能预算。
+3. 真实 DeepSeek/Qwen 评测；当前诊断主链使用确定性 Workflow，不依赖付费模型。
+4. AWS ECS/CloudWatch 实际部署任务 `T-PIPE-006`，仍保持阻塞。
+5. 正式身份提供方（OIDC/BFF Session）；当前静态 Token Registry 和 `VITE_AIOPS_DEV_TOKEN` 仅用于本地开发。
